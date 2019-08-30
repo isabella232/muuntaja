@@ -134,6 +134,16 @@
                 "application/jsonz"
                 "applicationz/+json"))))))
 
+    (testing "wildcards (name/*) & (*/*) successfully negotiate"
+      (let [interceptors [(interceptor/format-interceptor
+                            (dissoc m/default-options :default-format))
+                          echo]
+            response (-> (execute interceptors (->request "application/json" "application/*" nil json-string)) :body slurp)
+            response' (-> (execute interceptors (->request "application/json" "*/*" nil json-string)) :body slurp)]
+
+        (is (= json-string response))
+        (is (= json-string response'))))
+
     (testing "without :default-format & valid accept format, response format negotiation fails"
       (let [interceptors [(interceptor/format-interceptor
                             (dissoc m/default-options :default-format))
